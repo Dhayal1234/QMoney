@@ -46,8 +46,12 @@ public class PortfolioManagerApplication {
 
   public static List<String> mainReadFile(String[] args) throws IOException, URISyntaxException {
 
-     return Collections.emptyList();
+    File file = resolveFileFromResources(args[0]);
+    ObjectMapper objectMapper = getObjectMapper();
+    List<Trade> trades = Arrays.asList(objectMapper.readValue(file, Trade[].class));
+    return trades.stream().map(Trade::getSymbol).collect(Collectors.toList());
   }
+  
 
 
   // Note:
@@ -66,7 +70,7 @@ public class PortfolioManagerApplication {
   // 3. Use RestTemplate#getForObject in order to call the API,
   //    and deserialize the results in List<Candle>
 
-
+  
 
   private static void printJsonObject(Object object) throws IOException {
     Logger logger = Logger.getLogger(PortfolioManagerApplication.class.getCanonicalName());
@@ -101,7 +105,7 @@ public class PortfolioManagerApplication {
   //     to the variable named valueOfArgument0 (This is implemented for your reference.)
   //  2. In the same window, evaluate the value of expression below and set it
   //  to resultOfResolveFilePathArgs0
-  //     expression ==> resolveFileFromResources(args[0])
+  //    expression ==> resolveFileFromResources(args[0])
   //  3. In the same window, evaluate the value of expression below and set it
   //  to toStringOfObjectMapper.
   //  You might see some garbage numbers in the output. Dont worry, its expected.
@@ -122,6 +126,7 @@ public class PortfolioManagerApplication {
      String functionNameFromTestFileInStackTrace = "";
      String lineNumberFromTestFileInStackTrace = "";
 
+     
 
     return Arrays.asList(new String[]{valueOfArgument0, resultOfResolveFilePathArgs0,
         toStringOfObjectMapper, functionNameFromTestFileInStackTrace,
@@ -138,6 +143,7 @@ public class PortfolioManagerApplication {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     ThreadContext.put("runId", UUID.randomUUID().toString());
 
+  
     printJsonObject(mainReadFile(args));
 
 
