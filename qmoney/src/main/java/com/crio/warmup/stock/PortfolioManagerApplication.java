@@ -50,8 +50,15 @@ public class PortfolioManagerApplication {
     ObjectMapper objectMapper = getObjectMapper();
     List<Trade> trades = Arrays.asList(objectMapper.readValue(file, Trade[].class));
     return trades.stream().map(Trade::getSymbol).collect(Collectors.toList());
+
+
   }
-  
+  public static List<String> mainReadQuotes(String[] args) throws IOException, URISyntaxException {
+    File file = resolveFileFromResources(args[0]);
+    ObjectMapper objectMapper = getObjectMapper();
+    List<PortfolioTrade> trades = Arrays.asList(objectMapper.readValue(file, PortfolioTrade[].class));
+    return trades.stream().map(PortfolioTrade::getSymbol).collect(Collectors.toList());
+}
 
 
   // Note:
@@ -79,8 +86,9 @@ public class PortfolioManagerApplication {
   }
 
   private static File resolveFileFromResources(String filename) throws URISyntaxException {
-    return Paths.get(
-        Thread.currentThread().getContextClassLoader().getResource(filename).toURI()).toFile();
+     return Paths.get(
+         Thread.currentThread().getContextClassLoader().getResource(filename).toURI()).toFile();
+
   }
 
   private static ObjectMapper getObjectMapper() {
@@ -88,6 +96,7 @@ public class PortfolioManagerApplication {
     objectMapper.registerModule(new JavaTimeModule());
     return objectMapper;
   }
+
 
 
   // TODO: CRIO_TASK_MODULE_JSON_PARSING
@@ -121,12 +130,20 @@ public class PortfolioManagerApplication {
   public static List<String> debugOutputs() {
 
      String valueOfArgument0 = "trades.json";
-     String resultOfResolveFilePathArgs0 = "";
-     String toStringOfObjectMapper = "";
-     String functionNameFromTestFileInStackTrace = "";
-     String lineNumberFromTestFileInStackTrace = "";
+     String resultOfResolveFilePathArgs0 = "resolveFileFromResources(valueOfArgument0).toString()";
+     String toStringOfObjectMapper = "getObjectMapper().toString()";
+     String functionNameFromTestFileInStackTrace = "mainReadFile";
+     String lineNumberFromTestFileInStackTrace = "24";
 
      
+
+     try {
+      resultOfResolveFilePathArgs0 = resolveFileFromResources(valueOfArgument0).toString(); // 2. Evaluate resolveFileFromResources(args[0])
+      toStringOfObjectMapper = getObjectMapper().toString(); // 3. Evaluate getObjectMapper().toString()
+  } catch (URISyntaxException e) {
+      e.printStackTrace();
+  }
+
 
     return Arrays.asList(new String[]{valueOfArgument0, resultOfResolveFilePathArgs0,
         toStringOfObjectMapper, functionNameFromTestFileInStackTrace,

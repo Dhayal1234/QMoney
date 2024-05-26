@@ -24,7 +24,7 @@ class PortfolioManagerApplicationTest {
     String filename = "trades.json";
     List<String> expected = Arrays.asList(new String[]{"AAPL", "MSFT", "GOOGL"});
 
-    //when
+    //when  
     List<String> results = PortfolioManagerApplication
         .mainReadFile(new String[]{filename});
 
@@ -45,6 +45,8 @@ class PortfolioManagerApplicationTest {
 
     //then
     Assertions.assertEquals(expected, actual);
+
+  
   }
 
 
