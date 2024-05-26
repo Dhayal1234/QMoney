@@ -1,0 +1,1 @@
+curl "ht/daily/aapl/prices?token=f71d2aff7eda45260540e474df4faa986f285d6d"
