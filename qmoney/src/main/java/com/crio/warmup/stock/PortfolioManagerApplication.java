@@ -43,23 +43,52 @@ public class PortfolioManagerApplication {
   //  Note:
   //  1. There can be few unused imports, you will need to fix them to make the build pass.
   //  2. You can use "./gradlew build" to check if your code builds successfully.
+  public static List<PortfolioTrade> readTradesFromJson(String filename) throws IOException, URISyntaxException {
+    File file = resolveFileFromResources(filename);
+    ObjectMapper objectMapper = getObjectMapper();
+    return Arrays.asList(objectMapper.readValue(file, PortfolioTrade[].class));
+  }
+
 
   public static List<String> mainReadFile(String[] args) throws IOException, URISyntaxException {
-
-    File file = resolveFileFromResources(args[0]);
+    String filename = args[0]; // Assuming args[0] contains the filename
+    File file = resolveFileFromResources(filename);
     ObjectMapper objectMapper = getObjectMapper();
     List<Trade> trades = Arrays.asList(objectMapper.readValue(file, Trade[].class));
-    return trades.stream().map(Trade::getSymbol).collect(Collectors.toList());
 
+    List<String> symbols = trades.stream()
+            .map(Trade::getSymbol)
+            .collect(Collectors.toList());
 
-  }
+    return symbols;
+}
+
   public static List<String> mainReadQuotes(String[] args) throws IOException, URISyntaxException {
     File file = resolveFileFromResources(args[0]);
     ObjectMapper objectMapper = getObjectMapper();
     List<PortfolioTrade> trades = Arrays.asList(objectMapper.readValue(file, PortfolioTrade[].class));
-    return trades.stream().map(PortfolioTrade::getSymbol).collect(Collectors.toList());
-}
-
+    LocalDate endDate = LocalDate.parse(args[1]);
+  
+    String token = "f71d2aff7eda45260540e474df4faa986f285d6d"; // Replace with your Tiingo API key
+    RestTemplate restTemplate = new RestTemplate();
+  
+    List<PortfolioTrade> sortedTrades = trades.stream()
+        .map(trade -> {
+          String url = prepareUrl(trade, endDate, token);
+          TiingoCandle[] candles = restTemplate.getForObject(url, TiingoCandle[].class);
+          if (candles != null && candles.length > 0) {
+            trade.setClosingPrice(candles[candles.length - 1].getClose());
+          } else {
+            trade.setClosingPrice(Double.MAX_VALUE);
+          }
+          return trade;
+        })
+        .sorted(Comparator.comparingDouble(PortfolioTrade::getClosingPrice))
+        .collect(Collectors.toList());
+  
+    return sortedTrades.stream().map(PortfolioTrade::getSymbol).collect(Collectors.toList());
+  }
+  
 
   // Note:
   // 1. You may need to copy relevant code from #mainReadQuotes to parse the Json.
@@ -166,5 +195,13 @@ public class PortfolioManagerApplication {
 
 
   }
+public static String prepareUrl(PortfolioTrade trade, LocalDate endDate, String token) {
+  String symbol = trade.getSymbol();
+  String startDate = trade.getPurchaseDate().toString(); // Use the purchase date as the start date
+  String endDateStr = endDate.toString();
+  return String.format("https://api.tiingo.com/tiingo/daily/%s/prices?startDate=%s&endDate=%s&token=%s",
+      symbol, startDate, endDateStr, token);
+}
+
 }
 

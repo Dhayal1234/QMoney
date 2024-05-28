@@ -16,6 +16,7 @@ public class PortfolioTrade {
   private int quantity;
   private TradeType tradeType;
   private LocalDate purchaseDate;
+  private double closingPrice;
 
   public PortfolioTrade(String symbol, int quantity, LocalDate purchaseDate) {
     this.symbol = symbol;
@@ -57,5 +58,12 @@ public class PortfolioTrade {
     return tradeType;
   }
   //solution
+  public void setClosingPrice(double closingPrice) {
+    this.closingPrice = closingPrice;
+  }
+
+  public double getClosingPrice() {
+    return closingPrice;
+  }
 
 }
