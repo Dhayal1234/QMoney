@@ -76,11 +76,9 @@ public class PortfolioManagerApplication {
         .map(trade -> {
           String url = prepareUrl(trade, endDate, token);
           TiingoCandle[] candles = restTemplate.getForObject(url, TiingoCandle[].class);
-          if (candles != null && candles.length > 0) {
+          if (candles != null) {
             trade.setClosingPrice(candles[candles.length - 1].getClose());
-          } else {
-            trade.setClosingPrice(Double.MAX_VALUE);
-          }
+          } 
           return trade;
         })
         .sorted(Comparator.comparingDouble(PortfolioTrade::getClosingPrice))
