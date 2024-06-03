@@ -68,7 +68,7 @@ public class PortfolioManagerApplication {
 
          List<PortfolioTrade> portfolioTrades = getObjectMapper().readValue(
         resolveFileFromResources(filename), new TypeReference<List<PortfolioTrade>>() {});
-    return portfolioTrades;
+         return portfolioTrades;
 
 
       }
