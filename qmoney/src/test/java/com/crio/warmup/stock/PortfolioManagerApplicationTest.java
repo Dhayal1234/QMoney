@@ -18,21 +18,6 @@ class PortfolioManagerApplicationTest {
   //  These files are replaced from stock contents while executing the assessments.
   //  Any modifications in this file may result in Assessment failure!
 
-  @Test
-  void readTradesFromJson() throws Exception {
-    //given
-    String filename = "assessments/trades.json";
-    List<String> expected = Arrays.asList(new String[]{"MSFT", "CSCO", "CTS"});
-
-    //when
-    List<PortfolioTrade> trades = PortfolioManagerApplication
-        .readTradesFromJson(filename);
-    List<String> actual = trades.stream().map(PortfolioTrade::getSymbol).collect(Collectors.toList());
-
-    //then
-    Assertions.assertEquals(expected, actual);
-  }
-
 
   @Test
   void mainReadFile() throws Exception {

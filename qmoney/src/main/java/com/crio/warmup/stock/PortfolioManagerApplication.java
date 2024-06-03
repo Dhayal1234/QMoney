@@ -74,30 +74,46 @@ public class PortfolioManagerApplication {
       }
 
 
-  public static List<Candle> fetchCandles(PortfolioTrade trade, LocalDate endDate, String token) throws Exception {
+  public static List<Candle> fetchCandles(PortfolioTrade trade, LocalDate endDate, String token) {
     String urlString = String.format(
         "https://api.tiingo.com/tiingo/daily/%s/prices?startDate=%s&endDate=%s&token=%s",
         trade.getSymbol(), trade.getPurchaseDate().toString(), endDate.toString(), token);
-    URL url = new URL(urlString);
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    conn.setRequestMethod("GET");
-    conn.connect();
+    
+    URL url;
+    HttpURLConnection conn = null;
+    Scanner scanner = null;
+    
+    try {
+      url = new URL(urlString);
+      conn = (HttpURLConnection) url.openConnection();
+      conn.setRequestMethod("GET");
+      conn.connect();
 
-    // int responseCode = conn.getResponseCode();
-    // if (responseCode != 200) {
-    //   throw new RuntimeException("HttpResponseCode: " + responseCode);
-    // }
+      int responseCode = conn.getResponseCode();
+      if (responseCode != 200) {
+          throw new RuntimeException("HttpResponseCode: " + responseCode);
+      }
 
-    Scanner scanner = new Scanner(url.openStream());
-    StringBuilder inline = new StringBuilder();
-    while (scanner.hasNext()) {
-      inline.append(scanner.nextLine());
-    }
-    scanner.close();
+      scanner = new Scanner(url.openStream());
+      StringBuilder inline = new StringBuilder();
+      while (scanner.hasNext()) {
+          inline.append(scanner.nextLine());
+      }
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule());
-    return Arrays.asList(mapper.readValue(inline.toString(), TiingoCandle[].class));
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.registerModule(new JavaTimeModule());
+      return Arrays.asList(mapper.readValue(inline.toString(), TiingoCandle[].class));
+
+  } catch (IOException e) {
+      throw new RuntimeException("Failed to fetch candles: " + e.getMessage(), e);
+  } finally {
+      if (conn != null) {
+          conn.disconnect();
+      }
+      if (scanner != null) {
+          scanner.close();
+      }
+  }
   }
 
   
