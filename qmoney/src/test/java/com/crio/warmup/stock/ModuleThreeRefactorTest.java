@@ -49,13 +49,25 @@ class ModuleThreeRefactorTest {
 
   @Test
   public void fetchCandles() throws Exception {
-    PortfolioTrade trade = new PortfolioTrade();
-    trade.setPurchaseDate(LocalDate.parse("2020-01-01"));
-    trade.setSymbol("AAPL");
-    List<Candle> candleList = PortfolioManagerApplication.fetchCandles(trade, LocalDate.parse("2020-01-05"),
-            PortfolioManagerApplication.getToken());
-    Assertions.assertEquals(296.24, candleList.get(0).getOpen(), 0.1);
-    Assertions.assertEquals(297.15, candleList.get(candleList.size()-1).getOpen(), 0.1);
+    //PortfolioTrade trade = new PortfolioTrade();
+    //trade.setPurchaseDate(LocalDate.parse("2020-01-01"));
+    //trade.setSymbol("AAPL");
+    try {
+      PortfolioTrade trade = new PortfolioTrade();
+      trade.setPurchaseDate(LocalDate.parse("2020-01-01"));
+      trade.setSymbol("AAPL");
+      // Assuming fetchCandles returns List<Candle>
+      List<Candle> candleList = PortfolioManagerApplication.fetchCandles(trade, LocalDate.parse("2020-01-05"), PortfolioManagerApplication.getToken());
+      
+      Assertions.assertEquals(296.24, candleList.get(0).getOpen(), 0.1);
+      Assertions.assertEquals(297.15, candleList.get(candleList.size()-1).getOpen(), 0.1);
+  } catch (Exception e) {
+      Assertions.fail("Exception occurred: " + e.getMessage());
+  }
+    // List<Candle> candleList = PortfolioManagerApplication.fetchCandles(trade, LocalDate.parse("2020-01-05"),
+    //         PortfolioManagerApplication.getToken());
+    // Assertions.assertEquals(296.24, candleList.get(0).getOpen(), 0.1);
+    // Assertions.assertEquals(297.15, candleList.get(candleList.size()-1).getOpen(), 0.1);
   }
 
 }
