@@ -12,7 +12,6 @@ public class TiingoCandle implements Candle {
   private Double high;
   private Double low;
   private LocalDate date;
-  private Long volume;
 
   @Override
   public Double getOpen() {
@@ -68,14 +67,5 @@ public class TiingoCandle implements Candle {
             + ", low=" + low
             + ", date=" + date
             + '}';
-  }
-
-  @Override
-  public Long getVolume() {
-    return volume;
-  }
-
-  public void setVolume(Long volume) {
-    this.volume = volume;
   }
 }

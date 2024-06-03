@@ -14,6 +14,4 @@ public interface Candle {
   Double getLow();
 
   LocalDate getDate();
-
-  Long getVolume();
 }

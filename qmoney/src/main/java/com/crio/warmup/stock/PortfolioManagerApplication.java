@@ -8,6 +8,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.BufferedReader;
+import com.crio.warmup.stock.portfolio.PortfolioManager;
+import com.crio.warmup.stock.portfolio.PortfolioManagerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -283,6 +287,40 @@ public static List<String> mainReadQuotes(String[] args) throws IOException, URI
   // Note:
   // Remember to confirm that you are getting same results for annualized returns as in Module 3.
 
+  public static List<AnnualizedReturn> mainCalculateReturnsAfterRefactor(String[] args) {
+    try {
+      // Check for correct argument length
+      if (args.length < 3) {
+        System.err.println("Usage: <file> <end-date> <token>");
+        return Collections.emptyList();
+      }
+
+      // Parse the arguments
+      String filename = args[0];
+      LocalDate endDate = LocalDate.parse(args[1]);
+      String token = args[2];
+
+      // Read trades from the JSON file
+      ObjectMapper objectMapper = new ObjectMapper();
+      List<PortfolioTrade> trades = objectMapper.readValue(new File(filename), new TypeReference<List<PortfolioTrade>>() {});
+
+      // Create an instance of RestTemplate
+      RestTemplate restTemplate = new RestTemplate();
+
+      // Get an instance of PortfolioManager from PortfolioManagerFactory
+      PortfolioManager portfolioManager = PortfolioManagerFactory.getPortfolioManager(restTemplate);
+
+      // Calculate the annualized returns using the PortfolioManager instance
+      return portfolioManager.calculateAnnualizedReturn(trades, endDate);
+
+    } catch (IOException e) {
+      System.err.println("Error reading the JSON file: " + e.getMessage());
+    } catch (Exception e) {
+      System.err.println("An unexpected error occurred: " + e.getMessage());
+    }
+
+    return Collections.emptyList();
+  }
 
 
   public static void main(String[] args) throws Exception {
@@ -292,6 +330,7 @@ public static List<String> mainReadQuotes(String[] args) throws IOException, URI
   
     printJsonObject(mainCalculateSingleReturn(args));
 
+    List<AnnualizedReturn> returns = mainCalculateReturnsAfterRefactor(args);
 
 
   }
