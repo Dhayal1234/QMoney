@@ -58,6 +58,22 @@ public class PortfolioManagerApplication {
     return candles.get(candles.size() - 1).getClose();
   }
 
+  // TODO:
+  // After refactor, make sure that the tests pass by using these two commands
+  // ./gradlew test --tests PortfolioManagerApplicationTest.readTradesFromJson
+  // ./gradlew test --tests PortfolioManagerApplicationTest.mainReadFile
+  public static List<PortfolioTrade> readTradesFromJson(String filename)
+      throws IOException, URISyntaxException {
+
+
+         List<PortfolioTrade> portfolioTrades = getObjectMapper().readValue(
+        resolveFileFromResources(filename), new TypeReference<List<PortfolioTrade>>() {});
+    return portfolioTrades;
+
+
+      }
+
+
   public static List<Candle> fetchCandles(PortfolioTrade trade, LocalDate endDate, String token) throws Exception {
     String urlString = String.format(
         "https://api.tiingo.com/tiingo/daily/%s/prices?startDate=%s&endDate=%s&token=%s",
