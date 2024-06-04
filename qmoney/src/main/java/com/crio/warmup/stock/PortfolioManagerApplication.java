@@ -78,47 +78,16 @@ public class PortfolioManagerApplication {
       }
 
 
+
+
   public static List<Candle> fetchCandles(PortfolioTrade trade, LocalDate endDate, String token) {
-    String urlString = String.format(
-        "https://api.tiingo.com/tiingo/daily/%s/prices?startDate=%s&endDate=%s&token=%s",
-        trade.getSymbol(), trade.getPurchaseDate().toString(), endDate.toString(), token);
-    
-    URL url;
-    HttpURLConnection conn = null;
-    Scanner scanner = null;
-    
-    try {
-      url = new URL(urlString);
-      conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestMethod("GET");
-      conn.connect();
-
-      int responseCode = conn.getResponseCode();
-      if (responseCode != 200) {
-          throw new RuntimeException("HttpResponseCode: " + responseCode);
-      }
-
-      scanner = new Scanner(url.openStream());
-      StringBuilder inline = new StringBuilder();
-      while (scanner.hasNext()) {
-          inline.append(scanner.nextLine());
-      }
-
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.registerModule(new JavaTimeModule());
-      return Arrays.asList(mapper.readValue(inline.toString(), TiingoCandle[].class));
-
-  } catch (IOException e) {
-      throw new RuntimeException("Failed to fetch candles: " + e.getMessage(), e);
-  } finally {
-      if (conn != null) {
-          conn.disconnect();
-      }
-      if (scanner != null) {
-          scanner.close();
-      }
+    RestTemplate restTemplate = new RestTemplate();
+    String tiingoRestURL = prepareUrl(trade, endDate, token);
+    TiingoCandle[] tiingoCandleArray =
+        restTemplate.getForObject(tiingoRestURL, TiingoCandle[].class);
+    return Arrays.stream(tiingoCandleArray).collect(Collectors.toList());
   }
-  }
+
 
   
   public static List<AnnualizedReturn> mainCalculateSingleReturn(String[] args) throws IOException, URISyntaxException {
@@ -209,6 +178,28 @@ public static List<String> mainReadQuotes(String[] args) throws IOException, URI
 
   return sortedTrades.stream().map(PortfolioTrade::getSymbol).collect(Collectors.toList());
 }
+/*
+public static List<String> mainReadQuotes(String[] args) throws IOException, URISyntaxException {
+  final String tiingoToken = "953e5d1702c35f1aabd7a475fd8d256e2274d731";
+  List<PortfolioTrade> portfolioTrades = readTradesFromJson(args[0]);
+  LocalDate endDate = LocalDate.parse(args[1]);
+  RestTemplate restTemplate = new RestTemplate();
+  List<TotalReturnsDto> totalReturnsDtos = new ArrayList<>();
+  List<String> listOfSortSymbolsOnClosingPrice = new ArrayList<>();
+  for (PortfolioTrade portfolioTrade : portfolioTrades) {
+    String tiingoURL = prepareUrl(portfolioTrade, endDate, tiingoToken);
+    TiingoCandle[] tiingoCandleArray = restTemplate.getForObject(tiingoURL, TiingoCandle[].class);
+    totalReturnsDtos.add(new TotalReturnsDto(portfolioTrade.getSymbol(),
+        tiingoCandleArray[tiingoCandleArray.length - 1].getClose()));
+  }
+  Collections.sort(totalReturnsDtos,
+      (a, b) -> Double.compare(a.getClosingPrice(), b.getClosingPrice()));
+  for (TotalReturnsDto totalReturnsDto : totalReturnsDtos) {
+    listOfSortSymbolsOnClosingPrice.add(totalReturnsDto.getSymbol());
+  }
+  return listOfSortSymbolsOnClosingPrice;
+}
+*/
 
 
 
