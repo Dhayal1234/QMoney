@@ -46,4 +46,15 @@ test {
 }
 
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId = 'com.crio.warmup' 
+            artifactId = 'annual-return'
+            version = '1.0.0'
+        }
+    }
+}
 
